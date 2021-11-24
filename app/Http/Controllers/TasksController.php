@@ -4,16 +4,55 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class TasksController extends Controller
 {
     public function index(){
-        $tasks = auth()->user()->tasks();
-        return view('dashboard', compact('tasks'));
+        $user = Auth::user();
+        return view('dashboard', [
+            'tasks' => Task::orderBy('id', 'asc')->where('user_id', $user->id)->get(),
+        ]);
     }
 
+  /*   public function index_all(){
+        $user = Auth::user();
+
+        return view('tasks.filtered',[
+            'tasks' => Task::orderBy('created_at', 'asc')->where('user_id', $user->id)->get(),
+        ]);
+    }
+
+    public function index_incomplete(){
+        $user = Auth::user();
+
+        return view('tasks.filtered', [
+            'tasks' => Task::orderBy('created_at', 'asc')->where('user_id', $user->id)->where('completed', '0')->get(),
+        ]);
+    }
+
+    public function index_complete(){
+        $user = Auth::user();
+
+        return view('tasks.filtered', [
+            'tasks' => Task::orderBy('created_at', 'asc')->where('user_id', $user->id)->where('completed', '1')->get(),
+        ]);
+    }
+
+    */
+
     public function add(){
-        return view('add');
+        $statuses = [
+            [
+                'label' => 'Todo',
+                'value' => 'Todo',
+            ],
+            [
+                'label' => 'Done',
+                'value' => 'Done',
+            ],
+        ];
+        return view('add', compact('statuses'));
     }
 
     public function create(Request $request){
@@ -24,6 +63,7 @@ class TasksController extends Controller
         $task = new Task();
         $task->description = $request->description;
         $task->user_id = auth()->user()->id;
+        $task->status = $request->status;
         $task->save();
 
         return redirect('/dashboard');
@@ -33,7 +73,18 @@ class TasksController extends Controller
     public function edit(Task $task){
         if(auth()->user()->id == $task->user_id){
 
-            return view('edit', compact('task'));
+            $statuses = [
+                [
+                    'label' => 'Todo',
+                    'value' => 'Todo',
+                ],
+                [
+                    'label' => 'Done',
+                    'value' => 'Done',
+                ],
+            ];
+
+            return view('edit', compact('statuses', 'task'));
 
         }else{
 
@@ -55,6 +106,7 @@ class TasksController extends Controller
             ]);
 
             $task->description = $request->description;
+            $task->status = $request->status;
             $task->save();
 
             return redirect('/dashboard');

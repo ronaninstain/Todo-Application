@@ -17,6 +17,7 @@ class CreateTasksTable extends Migration
             $table->bigIncrements('id');
             $table->string('description');
             $table->integer('user_id')->unsigned()->index();
+            $table->enum('status', ['Todo', 'Done'])->default('Todo');
             $table->timestamps();
         });
     }

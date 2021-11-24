@@ -25,6 +25,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function(){
 
     Route::get('/task/{task}', [TasksController::class, 'edit']);
     Route::post('/task/{task}', [TasksController::class, 'update']);
+
+    Route::get('/task-all',[TasksController::class, 'index_all']);
+    Route::get('/task-complete',[TasksController::class, 'index_complete']);
+    Route::get('/task-incomplete',[TasksController::class, 'index_incomplete']);
+
 });
 
 require __DIR__.'/auth.php';
